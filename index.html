@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Instagram Media Downloader</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Instagram Downloader</h1>
+        <form id="downloadForm">
+            <input type="text" id="urlInput" placeholder="Paste Instagram URL here" required>
+            <button type="submit">Download</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        document.getElementById('downloadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            const res = await fetch('/download', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({url})
+            });
+            const data = await res.json();
+            const result = document.getElementById('result');
+            result.innerHTML = '';
+            if (data.success) {
+                data.media.forEach(item => {
+                    const link = document.createElement('a');
+                    link.href = item.url;
+                    link.textContent = "Download " + item.type;
+                    link.target = "_blank";
+                    result.appendChild(link);
+                    result.appendChild(document.createElement('br'));
+                });
+            } else {
+                result.innerHTML = '<p style="color:red;">' + data.error + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>
